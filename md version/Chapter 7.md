@@ -92,7 +92,23 @@ A. Waterman and K. Asanovi´c, editors. *The RISC-V Instruction Set Manual, Volu
 
 **图7.3：插入排序的RV32C代码。12条16位指令使得代码长度缩减了32%。每条指令的宽度可以很容易地得知。RV32C指令（以c.开头）在这个例子中显式出现，但通常汇编语言程序员和编译器无法看到它们。**
 
-![](pics/7.4.png)
+```assembly
+# RV32DC (11 instructions, 28 bytes)
+# a0 is n, a1 is pointer to x[0], a2 is pointer to y[0], fa0 is a
+  0: cd09	c.beqz a0,1a			# (expands to beq a0,x0,1a) if n==0, jump to Exit
+  2: 050e	c.slli a0,a0,0x3		# (expands to slli a0,a0,0x3) a0 = n*8
+  4: 9532	c.add a0,a2				# (expands to add a0,a0,a2) a0 = address of x[n]
+Loop:
+  6: 2218	c.fld fa4,0(a2)			# (expands to fld fa4,0(a2) ) fa5 = x[]
+  8: 219c		c.fld fa5,0(a1)		# (expands to fld fa5,0(a1) ) fa4 = y[]
+  a: 0621		c.addi a2,8			# (expands to addi a2,a2,8) a2++ (incr. ptr to y)
+  c: 05a1		c.addi a1,8			# (expands to addi a1,a1,8) a1++ (incr. ptr to x)
+  e: 72a7f7c3 fmadd.d fa5,fa5,fa0,fa4 # fa5 = a*x[i] + y[i]
+ 12: fef63c27 fsd fa5,-8(a2)		# y[i] = a*x[i] + y[i]
+ 16: fea618e3 bne a2,a0,6			# if i != n, jump to Loop
+Exit:
+ 1a: 8082 	  ret					# (expands to jalr x0,ra,0) return from function
+```
 
 **图7.4：DAXPY的RV32DC代码。8条十六位指令将代码长度缩减了36%。每条指令的宽度见第二列的十六进制字符个数。RV32C指令（以c.开头）在这个例子中显式出现，但通常汇编语言程序员和编译器无法看到它们。**
 
