@@ -90,6 +90,34 @@ A. Waterman and K. Asanovi´c, editors. *The RISC-V Instruction Set Manual, Volu
 
 [^1] http://parlab.eecs.berkeley.edu
 
+```assembly
+# RV32C (19 instructions, 52 bytes)
+# a1 is n, a3 points to a[0], a4 is i, a5 is j, a6 is x
+  0: 00450693 addi   a3,a0,4	# a3 is pointer to a[i]
+  4: 4705     c.li   a4,1		# (expands to addi a4,x0,1) i = 1
+Outer Loop:
+  6: 00b76363 bltu   a4,a1,c	# if i < n, jump to Continue Outer loop
+  a: 8082     c.ret		# (expands to jalr x0,ra,0) return from function
+Continue Outer Loop:
+  c: 0006a803 lw     a6,0(a3)	# x = a[i]
+ 10: 8636     c.mv   a2,a3		# (expands to add a2,x0,a3) a2 is pointer to a[j] 
+ 12: 87ba     c.mv   a5,a4		# (expands to add a5,x0,a4) j = i
+InnerLoop:
+ 14: ffc62883 lw	a7,-4(a2) 	# a7 = a[j-1]
+ 18: 01185763 ble	a7,a6,26  	# if a[j-1] <= a[i], jump to Exit InnerLoop
+ 1c: 01162023 sw 	a7,0(a2)  	# a[j] = a[j-1] InnerLoop
+ 20: 17fd	c.addi a5,-1		# (expands to addi a5,a5,-1) j--
+ 22: 1671	c.addi a2,-4		# (expands to addi a2,a2,-4)decr a2 to point to a[j]
+ 24: fbe5	c.bnez a5,14		# (expands to bne a5,x0,14)if j!=0,jump to InnerLoop
+Exit InnerLoop:
+ 26: 078a	c.slli a5,0x2		# (expands to slli a5,a5,0x2) multiply a5 by 4
+ 28: 97aa	c.add  a5,a0		# (expands to add a5,a5,a0)a5 = byte address of a[j] 
+ 2a: 0107a023 sw     a6,0(a5)	# a[j] = x
+ 2e: 0705	c.addi a4,1			# (expands to addi a4,a4,1) i++
+ 30: 0691	c.addi a3,4			# (expands to addi a3,a3,4) incr a3 to point to a[i] 
+ 32: bfd1	c.j    6			# (expands to jal x0,6) jump to Outer Loop
+```
+
 **图7.3：插入排序的RV32C代码。12条16位指令使得代码长度缩减了32%。每条指令的宽度可以很容易地得知。RV32C指令（以c.开头）在这个例子中显式出现，但通常汇编语言程序员和编译器无法看到它们。**
 
 ```assembly
