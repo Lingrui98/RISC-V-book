@@ -60,7 +60,7 @@ Q扩展增加了符合IEEE 754-2008标准的128位的四精度浮点指令。扩
 
 —— 亨利·大卫·梭罗（Henry David Thoreau），19世纪著名作家，1854
 
-> > > ![](pics/icon5.png)}
+> > > ![](pics/icon5.png)
 
 > > > ![](pics/icon8.png)
 
