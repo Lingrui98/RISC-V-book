@@ -323,11 +323,11 @@ Exit Inner Loop:
 ```assembly
 # ARM-32 (19 instructions, 76 bytes; or 18 insns/46 bytes with Thumb-2)
 # r0 points to a[0], r1 is n, r2 is j, r3 is i, r4 is x
-  0: e3a03001 mov  r3, #1		# i = 1
-  4: e1530001 cmp  r3, r1		# i vs. n (unnecessary?)
-  8: e1a0c000 mov  ip, r0		# ip = a[0]
-  c: 212fff1e bxcs lr			# don’t let return address change ISAs
- 10: e92d4030 push {r4, r5, lr}	# save r4, r5, return address
+  0: e3a03001 mov  r3, #1			# i = 1
+  4: e1530001 cmp  r3, r1			# i vs. n (unnecessary?)
+  8: e1a0c000 mov  ip, r0			# ip = a[0]
+  c: 212fff1e bxcs lr				# don’t let return address change ISAs
+ 10: e92d4030 push {r4, r5, lr}		# save r4, r5, return address
 Outer Loop:
  14: e5bc4004 ldr  r4, [ip, #4]!	# x = a[i] ; increment ip
  18: e1a02003 mov  r2, r3			# j = i
@@ -349,7 +349,38 @@ Exit Inner Loop:
 
 <center>图2.9：图2.5中插入排序的ARM-32代码。十六进制的地址在左边，接下来是十六进制的机器语言代码，然后是汇编语言指令，最后是注释、评论。由于寄存器不足，为了腾出两个空寄存器，以便之后重用，ARM-32将两个寄存器的值保存到堆栈中（和返回地址放在一起）。它使用了一种将i和j缩放为字节地址的寻址方式。鉴于分支跳转需要同时适用于ARM-32和Thumb-2，bxcs首先设置返回的最低有效位保存前地址为0。条件码使得我们在递减j后在检查它时可以少用一条比较指令，但在其他地方比较仍然需要三条指令。</center>
 
-![](pics/2.10.png)
+```assembly
+# MIPS-32 (24 instructions, 96 bytes, or 56 bytes with microMIPS)
+# a1 is n, a3 is pointer to a[0], v0 is j, v1 is i, t0 is x
+   0: 24860004 addiu a2,a0,4   	# a2 is pointer to a[i]
+   4: 24030001 li v1,1 			# i = 1
+Outer Loop:
+   8: 0065102b sltu  v0,v1,a1  	# set on i < n
+   c: 14400003 bnez  v0,1c		# if i<n, jump to Continue Outer Loop
+  10: 00c03825 move  a3,a2		# a3 is pointer to a[j] (slot filled)
+  14: 03e00008 jr	 ra			# return from function
+  18: 00000000 nop				# branch delay slot unfilled
+Continue Outer Loop:
+  1c: 8cc80000 lw	 t0,0(a2)	# x = a[i]
+  20: 00601025 move	 v0,v1		# j = i
+Inner Loop:
+  24: 8ce9fffc lw	 t1,-4(a3)	# t1 = a[j-1]
+  28: 00000000 nop				# load delay slot unfilled
+  2c: 0109502a slt	 t2,t0,t1	# set a[i] < a[j-1]
+  30: 11400005 beqz  t2,48     	# if a[j-1]<=a[i], jump to Exit Inner Loop
+  34: 00000000 nop             	# branch delay slot unfilled
+  38: 2442ffff addiu v0,v0,-1  	# j--
+  3c: ace90000 sw    t1,0(a3)  	# a[j] = a[j-1]
+  40: 1440fff8 bnez  v0,24     	# if j != 0, jump to Inner Loop
+  44: 24e7fffc addiu a3,a3,-4  	# decr. a2 to point to a[j] (slot filled)
+Exit Inner Loop:
+  48: 00021080 sll   v0,v0,0x2 	#
+  4c: 00821021 addu  v0,a0,v0  	# v0 now byte address oi a[j]
+  50: ac480000 sw    t0,0(v0)	# a[j] = x
+  54: 24630001 addiu v1,v1,1	# i++
+  58: 1000ffeb b     8			# jump to Outer Loop
+  5c: 24c60004 addiu a2,a2,4	# incr. a2 to point to a[i] (slot filled)
+```
 
 <center>图2.10：图2.5中插入排序的MIPS-32代码。十六进制的地址在左边，接下来是十六进制的机器语言代码，然后是汇编语言指令，最后是注释。MIPS-32代码中有三条nop指令，这增加了它的长度。两个是由于延迟分支，另一个是由于延迟加载。编译器无法找到有用的指令来填充延迟槽。延迟的分支也使代码更难理解，因为不管分支会不会跳转，延迟槽中的指令都会被执行。例如，地址5c处的最后一条指令（addiu）是循环的一部分，尽管它是在分支指令之后。</center>
 
