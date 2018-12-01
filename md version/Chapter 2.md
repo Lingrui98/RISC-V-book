@@ -384,6 +384,34 @@ Exit Inner Loop:
 
 <center>图2.10：图2.5中插入排序的MIPS-32代码。十六进制的地址在左边，接下来是十六进制的机器语言代码，然后是汇编语言指令，最后是注释。MIPS-32代码中有三条nop指令，这增加了它的长度。两个是由于延迟分支，另一个是由于延迟加载。编译器无法找到有用的指令来填充延迟槽。延迟的分支也使代码更难理解，因为不管分支会不会跳转，延迟槽中的指令都会被执行。例如，地址5c处的最后一条指令（addiu）是循环的一部分，尽管它是在分支指令之后。</center>
 
-![](pics/2.11.png)
+```assembly
+# x86-32 (20 instructions, 45 bytes)
+# eax is j, ecx is x, edx is i
+# pointer to a[0] is in memory at address esp+0xc, n is in memory at esp+0x10
+  0: 56 push esi				# save esi on stack (esi needed below)
+  1: 53 push ebx				# save ebx on stack (ebx needed below)
+  2: ba 01 00 00 00 mov edx,0x1	# i = 1
+  7: 8b 4c 24 0c	mov  ecx,[esp+0xc]	# ecx is pointer to a[0]
+Outer Loop:
+  b: 3b 54 24 10	cmp  edx,[esp+0x10]	# compare i vs. n
+  f: 73 19 			jae  2a <Exit Loop>	# if i >= n, jump to Exit Outer Loop
+ 11: 8b 1c 91		mov  ebx,[ecx+edx*4]	# x = a[i]
+ 14: 89 d0			mov  eax,edx			# j = i
+Inner Loop:
+ 16: 8b 74 81 fc	mov  esi,[ecx+eax*4-0x4] # esi = a[j-1]
+ 1a: 39 de			cmp  esi,ebx			# compare a[j-1] vs. x
+ 1c: 7e 06			jle  24 <Exit Loop>		# if a[j-1]<=a[i],jump Exit Inner Loop
+ 1e: 89 34 81		mov  [ecx+eax*4],esi	# a[j] = a[j-1]
+ 21: 48				dec  eax				# j--
+ 22: 75 f2			jne  16 <Inner Loop>	# if j != 0, jump to Inner Loop
+Exit Inner Loop:
+ 24: 89 1c 81		mov  [ecx+eax*4],ebx	# a[j] = x
+ 27: 42				inc  edx				# i++
+ 28: eb e1			jmp  b <Outer Loop>		# jump to Outer Loop
+Exit Outer Loop:
+ 2a: 5b				pop  ebx		# restore old value of ebx from stack
+ 2b: 5e				pop  esi		# restore old value of esi from stack
+ 2c: c3				ret				# return from function
+```
 
 <center>图2.11：图2.5中插入排序的x86-32代码。十六进制的地址在左边，接下来是十六进制的机器语言代码，然后是汇编语言指令，最后是注释。由于缺少寄存器，x86-32将将两个寄存器保存在堆栈中，以便腾出这两个寄存器供后续使用。而且，本来在RV32I中可以分配到寄存器的两个变量（n和指向a\[0\]的指针），现在是保存在内存中的。它使用扩展下标索引寻址模式，这对于访问\[i\]和\[j\]具有良好效果。这里的20条x32-86指令中有7条是只有一个字节那么长，这使得对于这个简单的程序，x86-32的代码规模很小。x86有两个流行的汇编语言版本：Intel/ Microsoft和AT＆T /Linux。我们使用英特尔语法，部分原因是它将目的地放在左边，而源操作数放在右边，与RISC-V，ARM-32和MIPS-32的操作数顺序一致。而AT＆T的操作数顺序则与之相反（并且对于寄存器操作数，需要在名字前加上%）。对于一些程序员来说，这看似微不足道的事情几乎是一个宗教问题。我们这里做出这样的选择，纯粹是因为教学方便，而非因为所谓"正统的信仰"。</center>
