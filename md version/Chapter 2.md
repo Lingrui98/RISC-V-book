@@ -320,7 +320,32 @@ Exit Inner Loop:
 
 <center>图2.8：插入排序的RV32I代码如图2.5所示。十六进制的地址在左边，接下来是十六进制的机器语言代码，然后是汇编语言指令，最后是评论以及注释。RV32I分配两个寄存器用以指向a\[j\]和a\[j-1\]。RV32I有很多寄存器，其中一些被ABI预留用于函数调用。与其他ISA不同，它会跳过保存和恢复寄存器值到内存的过程。虽然代码大小大于x86-32，但使用可选的RV32C指令（请参阅第七章）缩小了指令大小的差距。注意RV32I中的一条比较和分支指令顶得上ARM-32和x86-32比较所需的三条指令。</center>
 
-![](pics/2.9.png)
+```assembly
+# ARM-32 (19 instructions, 76 bytes; or 18 insns/46 bytes with Thumb-2)
+# r0 points to a[0], r1 is n, r2 is j, r3 is i, r4 is x
+  0: e3a03001 mov  r3, #1		# i = 1
+  4: e1530001 cmp  r3, r1		# i vs. n (unnecessary?)
+  8: e1a0c000 mov  ip, r0		# ip = a[0]
+  c: 212fff1e bxcs lr			# don’t let return address change ISAs
+ 10: e92d4030 push {r4, r5, lr}	# save r4, r5, return address
+Outer Loop:
+ 14: e5bc4004 ldr  r4, [ip, #4]!	# x = a[i] ; increment ip
+ 18: e1a02003 mov  r2, r3			# j = i
+ 1c: e1a0e00c mov  lr, ip			# lr = a[0] (using lr as scratch reg)
+Inner Loop:
+ 20: e51e5004 ldr  r5, [lr, #-4]	# r5 = a[j-1]
+ 24: e1550004 cmp  r5, r4			# compare a[j-1] vs. x
+ 28: da000002 ble  38				# if a[j-1]<=a[i], jump to Exit Inner Loop
+ 2c: e2522001 subs r2, r2, #1		# j--
+ 30: e40e5004 str  r5, [lr], #-4	# a[j] = a[j-1]
+ 34: 1afffff9 bne  20				# if j != 0, jump to Inner Loop
+Exit Inner Loop:
+ 38: e2833001 add  r3, r3, #1		# i++
+ 3c: e1530001 cmp  r3, r1			# i vs. n
+ 40: e7804102 str  r4, [r0, r2, lsl #2] # a[j] = x
+ 44: 3afffff2 bcc  14               # if i < n, jump to Outer Loop
+ 48: e8bd8030 pop  {r4, r5, pc}     # restore r4, r5, and return address
+```
 
 <center>图2.9：图2.5中插入排序的ARM-32代码。十六进制的地址在左边，接下来是十六进制的机器语言代码，然后是汇编语言指令，最后是注释、评论。由于寄存器不足，为了腾出两个空寄存器，以便之后重用，ARM-32将两个寄存器的值保存到堆栈中（和返回地址放在一起）。它使用了一种将i和j缩放为字节地址的寻址方式。鉴于分支跳转需要同时适用于ARM-32和Thumb-2，bxcs首先设置返回的最低有效位保存前地址为0。条件码使得我们在递减j后在检查它时可以少用一条比较指令，但在其他地方比较仍然需要三条指令。</center>
 
