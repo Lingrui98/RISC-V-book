@@ -289,7 +289,34 @@ A. Waterman and K. Asanovi´c, editors. *The RISC-V Instruction Set Manual, Volu
 
 <center>图2.7：RISC-V架构师从过去指令集设计的错误中吸取的教训。通常的教训是避免过去的ISA"优化"。经验和教训按照第一章中提出的七个ISA指标进行分类。在成本，简单性和性能下列出的许多指令集特性可以互换，因为这只是设计的偏好问题，但不管它们出现在哪里，它们都很重要。</center>
 
-![](pics/2.8.png)
+```assembly
+# RV32I (19 instructions, 76 bytes, or 52 bytes with RVC)
+# a1 is n, a3 points to a[0], a4 is i, a5 is j, a6 is x
+   0: 00450693  addi  a3,a0,4   # a3 is pointer to a[i]
+   4: 00100713 addi a4,x0,1 	# i = 1
+Outer Loop:
+   8: 00b76463  bltu  a4,a1,10  # if i < n, jump to Continue Outer loop
+Exit Outer Loop:
+   c: 00008067  jalr  x0,x1,0   # return from function
+Continue Outer Loop:
+  10: 0006a803  lw    a6,0(a3)	# x = a[i]
+  14: 00068613  addi  a2,a3,0	# a2 is pointer to a[j]
+  18: 00070793  addi	a5,a4,0	# j = i
+Inner Loop:
+  1c: ffc62883 lw 	a7,-4(a2)	# a7 = a[j-1]
+  20: 01185a63 bge	a6,a7,34	# if a[j-1] < a[i], jump to Exit Inner Loop
+  24: 01162023 sw	a7,0(a2)	# a[j] = a[j-1]
+  28: fff78793 addi a5,a5,-1 	# j--
+  2c: ffc60613 addi a2,a2,-4 	# decrement a2 to point to a[j]
+  30: fe0796e3 bne a5,x0,1c 	# if j != 0,jump to Inner Loop
+Exit Inner Loop:
+  34: 00279793  slli  a5,a5,0x2 # multiply a5 by 4
+  38: 00f507b3  add   a5,a0,a5	# a5 is now byte address oi a[j]
+  3c: 0107a023  sw    a6,0(a5)	# a[j] = x
+  40: 00170713  addi  a4,a4,1	# i++
+  44: 00468693  addi  a3,a3,4	# increment a3 to point to a[i]
+  48: fc1ff06f  jal   x0,8		# jump to Outer Loop
+```
 
 <center>图2.8：插入排序的RV32I代码如图2.5所示。十六进制的地址在左边，接下来是十六进制的机器语言代码，然后是汇编语言指令，最后是评论以及注释。RV32I分配两个寄存器用以指向a\[j\]和a\[j-1\]。RV32I有很多寄存器，其中一些被ABI预留用于函数调用。与其他ISA不同，它会跳过保存和恢复寄存器值到内存的过程。虽然代码大小大于x86-32，但使用可选的RV32C指令（请参阅第七章）缩小了指令大小的差距。注意RV32I中的一条比较和分支指令顶得上ARM-32和x86-32比较所需的三条指令。</center>
 
