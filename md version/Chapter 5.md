@@ -151,7 +151,7 @@ void daxpy(size_t n, double a, const double x[], double y[])
 
 少即是多。
 
----- Robert Browning, 1855，极简主义（建筑）建筑学派在20世纪80年代采用这首诗作为公理。
+—— Robert Browning, 1855，极简主义（建筑）建筑学派在20世纪80年代采用这首诗作为公理。
 
 IEEE 754-2008浮点标准\[IEEE Standards Committee 2008\]定义了浮点数据类型，计算精度和所需操作。它的广泛流行大大降低了移植浮点程序的难度，这也意味着不同ISA中的浮点数部分可能比其他章节中描述的其他部分的指令更一致。
 
@@ -167,8 +167,6 @@ A. Waterman and K. Asanovi´c, editors. *The RISC-V Instruction Set Manual, Volu
 ## 注
 
 [^1] http://parlab.eecs.berkeley.edu
-
-![](pics/image10.png)
 
 ```assembly
 # RV32FD (7 insns in loop; 11 insns/44 bytes total; 28 bytes RVC)
