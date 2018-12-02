@@ -1,6 +1,8 @@
 # Summary
 
-* [对这本RISC-V手册的称赞](README.md)
+
+* [中文版说明](README.md)
+* [对本书的称赞](Praise.md)
 * [参考卡](Reference card.md)
 * [致谢](Acknowledgements.md)
 * [关于作者](About authors.md)
