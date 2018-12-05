@@ -1,11 +1,11 @@
 # 2. RV32I：RISC-V基础整数指令集
 
->>>![](pics/FrancesElizabeth.png)
->>>**Frances Elizabeth "Fran" Allen**(1932 -- )被授予图灵奖主要是因为她在优化编译器方面的工作。图灵奖是计算机科学的最高奖项。
-
 *......提升计算性能并且让用户能切实享受到性能提升的唯一方法是同时设计编译器和计算机。这样软件用不到的特性将不会被实现在硬件上......*
 
-—— Frances Elizabeth "Fran" Allen, 1981
+<div align=right>—— Frances Elizabeth "Fran" Allen, 1981<div>
+
+>>>>>>![](pics/FrancesElizabeth.png)
+>>>**Frances Elizabeth "Fran" Allen**(1932 -- )被授予图灵奖主要是因为她在优化编译器方面的工作。图灵奖是计算机科学的最高奖项。
 
 ## 2.1 导言
 
@@ -36,10 +36,9 @@
 
 ![](pics/2.3.png)
 
-<center>图2.3：RV32I带有指令布局，操作码，格式类型和名称的操作码映射。（此图基于\[Waterman and Asanovi\'c 2017\]的表19.2。）</center>
+<center>图2.3：RV32I带有指令布局，操作码，格式类型和名称的操作码映射。（此图基于[Waterman and Asanovi\'c 2017]的表19.2。）</center>
 
 >> **补充说明：B类型和J类型指令**
->>
 >> 如下所述，分支指令（B类型）的立即数字段在S类型的基础上旋转了1位。跳转指令（J类型）的直接字段在U类型的基础上旋转了12位。因此,RISC-V实际上只有四种基本格式，但我们可以保守地认为它有六种格式。
 
 >>>![](pics/icon7.png)
@@ -55,15 +54,14 @@
 
 ARM-32 指令集12位的立即字段不仅仅是一个常量，而是一个函数的输入，此函数根据12位立即数的输入来产生一个常量：8位被零扩展到全宽度，然后被循环右移。右移的位数是12位立即数中剩余4位的值乘2。设计者希望在12位中编码更多有用的常数来减少执行指令的数量。在大多数指令格式中，ARM-32也将十分宝贵的四位编码空间拿出来专门用于条件执行。这些条件执行指令不仅使用频率低而且增加了乱序处理器的复杂性。
 
-![](pics/icon3.png)
+>>>![](pics/icon3.png)
 
 > >**补充说明：乱序执行处理器**
-> >
 > >这是一种高速的、流水化的处理器。它们一有机会就执行指令，而不是在按照程序顺序。这种处理器的一个关键特性是寄存器重命名，把程序中的寄存器名称映射到大量的内部物理寄存器。条件执行的问题是不管条件是否成立，都必须给这些指令中的寄存器分配相应的物理寄存器。但内部物理寄存器的可用性是影响乱序处理器的关键性能资源。
 
 ## 2.3 RV32I寄存器
 
-![](pics/icon7.png)
+>>>![](pics/icon7.png)
 
 图2.4列出了RV32I寄存器以及由RISC-V应用程序二进制接口（ABI）所定义的寄存器名称。在我们的示例代码中，我们将使用ABI名称，使它们更容易阅读。为了满足汇编语言程序员和编译器编写者，RV32I有31寄存器加上一个值恒为0的x0寄存器。与之相比，ARM-32只有16个寄存器，x86-32甚至只有8
 个寄存器。
@@ -99,14 +97,12 @@ RV32I也不包含乘法和除法，它们包含在可选的RV32M扩展中（参�
 
 ![](pics/2.4.png)
 
-<center>图2.4：RV32I的寄存器。第3章解释了RISC-V调用约定，各种指针（sp，gp，tp，fp），保存寄存器（s0-s11）和临时寄存器（t0-t6）背后的基本原理（基于\[Watermanand Asanovi\'c 2017\]的图2.1和表20.1）。</center>
+<center>图2.4：RV32I的寄存器。第3章解释了RISC-V调用约定，各种指针（sp，gp，tp，fp），保存寄存器（s0-s11）和临时寄存器（t0-t6）背后的基本原理（基于[Watermanand Asanovi\'c 2017]的图2.1和表20.1）。</center>
 
 >>**补充说明：“位操作”指令**
->>
 >>RISC-V基金会正在考虑把rotate之类的位操作指令作为可选指令扩展RV32B的一部分（见第11章）。
 
 > >**补充说明：利用 $$xor$$ 指令进行的花式操作**
-> >
 > >您可以在不使用中间寄存器的情况下交换两个值！此代码交换$$x1$$和$$x2$$的值。我们将证明留给读者。提示：异或操作是交换的 $$ (a \oplus b) = (b \oplus a)$$，结合的$$( (a \oplus b)  \oplus c = a \oplus (b  \oplus c))$$ ，是它自己的逆操作$$(a \oplus a = 0)$$，并且有一个单位元$$(a \oplus 0 = a)$$。
 > >
 > >xor x1,x1,x2 # x1’ == x1^x2, x2’ == x2
@@ -151,10 +147,10 @@ RV32I可以比较两个寄存器并根据比较结果上进行分支跳转。比
 >>**补充说明：不使用条件码实现大位宽数据的加法**
 >>在RV32I中是通过sltu计算进位来实现的：
 ```
-add a0,a2,a4  # 加低32 位: a0 = a2 + a4
-sltu a2,a0,a2 # 若 (a2+a4) < a2那么a2’ = 1, 否则a2’ = 0
-add a5,a3,a5  # 加高32位: a5 = a3 + a5
-add a1,a2,a5  # 加上低32位的进位
+	add  a0,a2,a4  # 加低32 位: a0 = a2 + a4
+	sltu  a2,a0,a2  # 若 (a2+a4) < a2 那么a2’ = 1，否则a2’ = 0
+	add  a5,a3,a5  # 加高32位: a5 = a3 + a5
+	add  a1,a2,a5  # 加上低32位的进位
 ```
 >>**补充说明：获取PC**
 >>当前的PC可以通过将auipc的U立即数字段设置为0来获得。对于x86-32，要想读取PC，你需要先进行函数调用，（这样子可以将PC推入堆栈）;然后被调用的函数可以从堆栈中读取刚被压栈的PC，最后将PC值返回给调用者（需要再弹出堆栈）。因此，获取当前的PC至少需要1个store，2个load和2个跳转！
@@ -181,7 +177,7 @@ bne t3, t4, overflow  # 若 (t2<0) && (t1+t2>=t1)
 
 跳转和链接指令的寄存器版本（jalr）同样是多用途的。它可以调用地址是动态计算出来的函数，或者也可以实现调用返回（只需ra作为源寄存器，零寄存器（x0）作为目的寄存器）。Switch和case语句的地址跳转，也可以使用jalr指令，目的寄存器设为x0。
 
-> >> **寄存器窗口**通过使用多于32个寄存器来加速函数调用。新函数将在调用时获得32个寄存器的新集合或窗口。为了传递参数，窗口重叠，这意味着一些寄存器位于两个相邻的窗口中。
+>>> **寄存器窗口**通过使用多于32个寄存器来加速函数调用。新函数将在调用时获得32个寄存器的新集合或窗口。为了传递参数，窗口重叠，这意味着一些寄存器位于两个相邻的窗口中。
 
 **有什么不同之处？**RV32I避开了错综复杂的程序调用指令，例如x86-32的进入和离开指令，或Intel Itanium，Oracle SPARC和Cadence Tensilica中的寄存器窗口。
 
@@ -216,7 +212,7 @@ fence指令对外部可见的访存请求，如设备I/O和内存访问等进行
 
 <center>图 2.6：插入排序在不同指令集下生成的指令数目以及指令大小。第7章会介绍ARM Thumb-2, microMIPS以及RV32C指令集。</center>
 
-![](pics/icon2.png)
+>>>![](pics/icon2.png)
 
 **有什么不同之处？**RISC-V使用内存映射I/O而不是像x86-32一样，使用in，ins，insb，insw和out，out，outsb等指令来进行I/O。为支持字符串处理，RISC-V实现了字节存取，而不是像x86-32那样实现了rep，movs，coms，scas，lods等16条特殊的字符串处理指令。
 
@@ -230,9 +226,10 @@ fence指令对外部可见的访存请求，如设备I/O和内存访问等进行
 
 ## 2.10 结束语
 
-*那些不记得过去的人，注定要重复过去。*—— George Santayana, 1905
+*那些不记得过去的人，注定要重复过去。*
+<div align=right>—— George Santayana, 1905<div>
 
-> >所有RISC-V指令的谱系记录在[Chen & Patterson 2016]中。
+> >所有RISC-V指令的谱系记录在[Chen \& Patterson 2016]中。
 
 图2.7使用第1章中的七个ISA设计指标来组织前面提到的一些过去的指令集中学习到的经验教训，并说明了这些经验教训对RV32I设计的积极影响。我们并不是说RISC-V是第一个拥有这些积极结果的ISA。事实上，RV32I从RISC-I，它的曾祖父母\[Patterson 2017\]那里，继承了如下这些特性：
 
@@ -255,7 +252,6 @@ RISC-V的出现比过去的ISA晚了四分之一到三分之一个世纪后开�
 >>**补充说明：RV32I是否与众不同？**
 >>早期的微处理器有单独的浮点运算芯片，所以那些浮点运算指令是可选的。摩尔定律使得我们很快就将所有功能（包括浮点运算）都实现了在同一块芯片上，而且模块化在指令集中逐渐消失。在更简单的处理器中只实现完整的指令集的子集，并利用软件异常来模拟未实现的指令，如同数十年前的在IBM 360的44型号和Digital Equipment microVAX。RV32I的不同之处在于完整的软件堆栈只需要RV32I中的基本指令，因此，对于RV32G中未实现的指令，RV32I处理器无需通过软件异常来进行模拟。在这方面，最接近RISC-V的ISA可能是Tensilica Xtensa，它是专为嵌入式应用设计的。它的指令集包含有80条基础指令。并且它的指令集旨在被用户根据自己的需求扩展一些加速指令，以加速其应用程序。与Tensilica Xtensa相比，RV32I具有更简单的基础ISA，具有64位地址版本，并且对超级计算机和微控制器都提供了针对性的指令集扩展。
 
-
 ## 2.11 扩展阅读
 
 Lindy effect, 2017. URL https://en.wikipedia.org/wiki/Lindy\_effect.
@@ -268,9 +264,7 @@ K. R. Irvine. *Assembly language for x86 processors*. Prentice Hall, 2014.
 
 D. Patterson. How close is RISC-V to RISC-I?, 2017.
 
-A. Waterman and K. Asanovi´c, editors. *The RISC-V Instruction Set Manual, Volume I:*
-
-*User-Level ISA, Version 2.2*. May 2017. URL https://riscv.org/specifications/.
+A. Waterman and K. Asanovi´c, editors. *The RISC-V Instruction Set Manual, Volume I: User-Level ISA, Version 2.2*. May 2017. URL https://riscv.org/specifications/.
 
 ## 注
 
@@ -292,30 +286,30 @@ A. Waterman and K. Asanovi´c, editors. *The RISC-V Instruction Set Manual, Volu
 ```assembly
 # RV32I (19 instructions, 76 bytes, or 52 bytes with RVC)
 # a1 is n, a3 points to a[0], a4 is i, a5 is j, a6 is x
-   0: 00450693  addi  a3,a0,4   # a3 is pointer to a[i]
-   4: 00100713 addi a4,x0,1 	# i = 1
+   0: 00450693  addi  a3,a0,4      # a3 is pointer to a[i]
+   4: 00100713  addi  a4,x0,1 	# i = 1
 Outer Loop:
-   8: 00b76463  bltu  a4,a1,10  # if i < n, jump to Continue Outer loop
+   8: 00b76463  bltu  a4,a1,10    # if i < n, jump to Continue Outer loop
 Exit Outer Loop:
-   c: 00008067  jalr  x0,x1,0   # return from function
+   c: 00008067  jalr   x0,x1,0        # return from function
 Continue Outer Loop:
-  10: 0006a803  lw    a6,0(a3)	# x = a[i]
-  14: 00068613  addi  a2,a3,0	# a2 is pointer to a[j]
-  18: 00070793  addi	a5,a4,0	# j = i
+  10: 0006a803  lw    a6,0(a3)	  # x = a[i]
+  14: 00068613  addi  a2,a3,0      # a2 is pointer to a[j]
+  18: 00070793  addi a5,a4,0       # j = i
 Inner Loop:
-  1c: ffc62883 lw 	a7,-4(a2)	# a7 = a[j-1]
-  20: 01185a63 bge	a6,a7,34	# if a[j-1] < a[i], jump to Exit Inner Loop
-  24: 01162023 sw	a7,0(a2)	# a[j] = a[j-1]
-  28: fff78793 addi a5,a5,-1 	# j--
-  2c: ffc60613 addi a2,a2,-4 	# decrement a2 to point to a[j]
-  30: fe0796e3 bne a5,x0,1c 	# if j != 0,jump to Inner Loop
+  1c: ffc62883 lw 	a7,-4(a2)	 # a7 = a[j-1]
+  20: 01185a63 bge	a6,a7,34    # if a[j-1] < a[i], jump to Exit Inner Loop
+  24: 01162023 sw	a7,0(a2)    # a[j] = a[j-1]
+  28: fff78793 addi a5,a5,-1          # j--
+  2c: ffc60613 addi a2,a2,-4          # decrement a2 to point to a[j]
+  30: fe0796e3 bne a5,x0,1c         # if j != 0,jump to Inner Loop
 Exit Inner Loop:
-  34: 00279793  slli  a5,a5,0x2 # multiply a5 by 4
-  38: 00f507b3  add   a5,a0,a5	# a5 is now byte address oi a[j]
-  3c: 0107a023  sw    a6,0(a5)	# a[j] = x
-  40: 00170713  addi  a4,a4,1	# i++
+  34: 00279793  slli  a5,a5,0x2      # multiply a5 by 4
+  38: 00f507b3  add   a5,a0,a5	 # a5 is now byte address oi a[j]
+  3c: 0107a023  sw    a6,0(a5)	  # a[j] = x
+  40: 00170713  addi  a4,a4,1       # i++
   44: 00468693  addi  a3,a3,4	# increment a3 to point to a[i]
-  48: fc1ff06f  jal   x0,8		# jump to Outer Loop
+  48: fc1ff06f      jal   x0,8		 # jump to Outer Loop
 ```
 
 <center>图2.8：插入排序的RV32I代码如图2.5所示。十六进制的地址在左边，接下来是十六进制的机器语言代码，然后是汇编语言指令，最后是评论以及注释。RV32I分配两个寄存器用以指向a\[j\]和a\[j-1\]。RV32I有很多寄存器，其中一些被ABI预留用于函数调用。与其他ISA不同，它会跳过保存和恢复寄存器值到内存的过程。虽然代码大小大于x86-32，但使用可选的RV32C指令（请参阅第七章）缩小了指令大小的差距。注意RV32I中的一条比较和分支指令顶得上ARM-32和x86-32比较所需的三条指令。</center>
@@ -325,26 +319,26 @@ Exit Inner Loop:
 # r0 points to a[0], r1 is n, r2 is j, r3 is i, r4 is x
   0: e3a03001 mov  r3, #1			# i = 1
   4: e1530001 cmp  r3, r1			# i vs. n (unnecessary?)
-  8: e1a0c000 mov  ip, r0			# ip = a[0]
-  c: 212fff1e bxcs lr				# don’t let return address change ISAs
- 10: e92d4030 push {r4, r5, lr}		# save r4, r5, return address
+  8: e1a0c000 mov  ip, r0			 # ip = a[0]
+  c: 212fff1e    bxcs  lr			       # don’t let return address change ISAs
+ 10: e92d4030 push {r4, r5, lr}	                # save r4, r5, return address
 Outer Loop:
- 14: e5bc4004 ldr  r4, [ip, #4]!	# x = a[i] ; increment ip
- 18: e1a02003 mov  r2, r3			# j = i
- 1c: e1a0e00c mov  lr, ip			# lr = a[0] (using lr as scratch reg)
+ 14: e5bc4004 ldr     r4, [ip, #4]!	              # x = a[i] ; increment ip
+ 18: e1a02003 mov  r2, r3			 # j = i
+ 1c: e1a0e00c  mov  lr, ip			     # lr = a[0] (using lr as scratch reg)
 Inner Loop:
- 20: e51e5004 ldr  r5, [lr, #-4]	# r5 = a[j-1]
- 24: e1550004 cmp  r5, r4			# compare a[j-1] vs. x
- 28: da000002 ble  38				# if a[j-1]<=a[i], jump to Exit Inner Loop
- 2c: e2522001 subs r2, r2, #1		# j--
- 30: e40e5004 str  r5, [lr], #-4	# a[j] = a[j-1]
- 34: 1afffff9 bne  20				# if j != 0, jump to Inner Loop
+ 20: e51e5004 ldr     r5, [lr, #-4]	               # r5 = a[j-1]
+ 24: e1550004 cmp  r5, r4			 # compare a[j-1] vs. x
+ 28: da000002 ble  38			        # if a[j-1]<=a[i], jump to Exit Inner Loop
+ 2c: e2522001 subs r2, r2, #1		    # j--
+ 30: e40e5004 str  r5, [lr], #-4	           # a[j] = a[j-1]
+ 34: 1afffff9     bne  20			       # if j != 0, jump to Inner Loop
 Exit Inner Loop:
- 38: e2833001 add  r3, r3, #1		# i++
- 3c: e1530001 cmp  r3, r1			# i vs. n
- 40: e7804102 str  r4, [r0, r2, lsl #2] # a[j] = x
- 44: 3afffff2 bcc  14               # if i < n, jump to Outer Loop
- 48: e8bd8030 pop  {r4, r5, pc}     # restore r4, r5, and return address
+ 38: e2833001 add  r3, r3, #1		    # i++
+ 3c: e1530001 cmp  r3, r1			 # i vs. n
+ 40: e7804102 str  r4, [r0, r2, lsl #2]         # a[j] = x
+ 44: 3afffff2 bcc  14                                     # if i < n, jump to Outer Loop
+ 48: e8bd8030 pop  {r4, r5, pc}                 # restore r4, r5, and return address
 ```
 
 <center>图2.9：图2.5中插入排序的ARM-32代码。十六进制的地址在左边，接下来是十六进制的机器语言代码，然后是汇编语言指令，最后是注释、评论。由于寄存器不足，为了腾出两个空寄存器，以便之后重用，ARM-32将两个寄存器的值保存到堆栈中（和返回地址放在一起）。它使用了一种将i和j缩放为字节地址的寻址方式。鉴于分支跳转需要同时适用于ARM-32和Thumb-2，bxcs首先设置返回的最低有效位保存前地址为0。条件码使得我们在递减j后在检查它时可以少用一条比较指令，但在其他地方比较仍然需要三条指令。</center>
@@ -352,34 +346,34 @@ Exit Inner Loop:
 ```assembly
 # MIPS-32 (24 instructions, 96 bytes, or 56 bytes with microMIPS)
 # a1 is n, a3 is pointer to a[0], v0 is j, v1 is i, t0 is x
-   0: 24860004 addiu a2,a0,4   	# a2 is pointer to a[i]
-   4: 24030001 li v1,1 			# i = 1
+   0: 24860004 addiu a2,a0,4   	    # a2 is pointer to a[i]
+   4: 24030001 li          v1,1 	    # i = 1
 Outer Loop:
-   8: 0065102b sltu  v0,v1,a1  	# set on i < n
-   c: 14400003 bnez  v0,1c		# if i<n, jump to Continue Outer Loop
-  10: 00c03825 move  a3,a2		# a3 is pointer to a[j] (slot filled)
-  14: 03e00008 jr	 ra			# return from function
-  18: 00000000 nop				# branch delay slot unfilled
+   8: 0065102b sltu     v0,v1,a1  	 # set on i < n
+   c: 14400003  bnez   v0,1c	   # if i<n, jump to Continue Outer Loop
+  10: 00c03825  move  a3,a2		# a3 is pointer to a[j] (slot filled)
+  14: 03e00008  jr	     ra	               # return from function
+  18: 00000000 nop			    # branch delay slot unfilled
 Continue Outer Loop:
-  1c: 8cc80000 lw	 t0,0(a2)	# x = a[i]
-  20: 00601025 move	 v0,v1		# j = i
+  1c: 8cc80000 lw	   t0,0(a2)	     # x = a[i]
+  20: 00601025 move   v0,v1	         # j = i
 Inner Loop:
-  24: 8ce9fffc lw	 t1,-4(a3)	# t1 = a[j-1]
-  28: 00000000 nop				# load delay slot unfilled
-  2c: 0109502a slt	 t2,t0,t1	# set a[i] < a[j-1]
-  30: 11400005 beqz  t2,48     	# if a[j-1]<=a[i], jump to Exit Inner Loop
-  34: 00000000 nop             	# branch delay slot unfilled
-  38: 2442ffff addiu v0,v0,-1  	# j--
-  3c: ace90000 sw    t1,0(a3)  	# a[j] = a[j-1]
-  40: 1440fff8 bnez  v0,24     	# if j != 0, jump to Inner Loop
-  44: 24e7fffc addiu a3,a3,-4  	# decr. a2 to point to a[j] (slot filled)
+  24: 8ce9fffc     lw	 t1,-4(a3)	  # t1 = a[j-1]
+  28: 00000000 nop			    # load delay slot unfilled
+  2c: 0109502a  slt	     t2,t0,t1	   # set a[i] < a[j-1]
+  30: 11400005  beqz  t2,48     	# if a[j-1]<=a[i], jump to Exit Inner Loop
+  34: 00000000  nop             	     # branch delay slot unfilled
+  38: 2442ffff      addiu v0,v0,-1         # j--
+  3c: ace90000   sw       t1,0(a3)         # a[j] = a[j-1]
+  40: 1440fff8     bnez   v0,24             # if j != 0, jump to Inner Loop
+  44: 24e7fffc     addiu  a3,a3,-4        # decr. a2 to point to a[j] (slot filled)
 Exit Inner Loop:
-  48: 00021080 sll   v0,v0,0x2 	#
-  4c: 00821021 addu  v0,a0,v0  	# v0 now byte address oi a[j]
-  50: ac480000 sw    t0,0(v0)	# a[j] = x
-  54: 24630001 addiu v1,v1,1	# i++
-  58: 1000ffeb b     8			# jump to Outer Loop
-  5c: 24c60004 addiu a2,a2,4	# incr. a2 to point to a[i] (slot filled)
+  48: 00021080  sll        v0,v0,0x2      #
+  4c: 00821021  addu   v0,a0,v0        # v0 now byte address oi a[j]
+  50: ac480000  sw       t0,0(v0)         # a[j] = x
+  54: 24630001  addiu  v1,v1,1         # i++
+  58: 1000ffeb    b         8		   # jump to Outer Loop
+  5c: 24c60004  addiu  a2,a2,4	    # incr. a2 to point to a[i] (slot filled)
 ```
 
 <center>图2.10：图2.5中插入排序的MIPS-32代码。十六进制的地址在左边，接下来是十六进制的机器语言代码，然后是汇编语言指令，最后是注释。MIPS-32代码中有三条nop指令，这增加了它的长度。两个是由于延迟分支，另一个是由于延迟加载。编译器无法找到有用的指令来填充延迟槽。延迟的分支也使代码更难理解，因为不管分支会不会跳转，延迟槽中的指令都会被执行。例如，地址5c处的最后一条指令（addiu）是循环的一部分，尽管它是在分支指令之后。</center>
@@ -388,30 +382,30 @@ Exit Inner Loop:
 # x86-32 (20 instructions, 45 bytes)
 # eax is j, ecx is x, edx is i
 # pointer to a[0] is in memory at address esp+0xc, n is in memory at esp+0x10
-  0: 56 push esi				# save esi on stack (esi needed below)
-  1: 53 push ebx				# save ebx on stack (ebx needed below)
-  2: ba 01 00 00 00 mov edx,0x1	# i = 1
-  7: 8b 4c 24 0c	mov  ecx,[esp+0xc]	# ecx is pointer to a[0]
+  0: 56                         push esi				# save esi on stack (esi needed below)
+  1: 53                         push ebx			       # save ebx on stack (ebx needed below)
+  2: ba 01 00 00 00   mov edx,0x1	                      # i = 1
+  7: 8b 4c 24 0c	mov  ecx,[esp+0xc]	             # ecx is pointer to a[0]
 Outer Loop:
-  b: 3b 54 24 10	cmp  edx,[esp+0x10]	# compare i vs. n
-  f: 73 19 			jae  2a <Exit Loop>	# if i >= n, jump to Exit Outer Loop
- 11: 8b 1c 91		mov  ebx,[ecx+edx*4]	# x = a[i]
- 14: 89 d0			mov  eax,edx			# j = i
+  b: 3b 54 24 10	cmp  edx,[esp+0x10]	           # compare i vs. n
+  f: 73 19 			jae  2a <Exit Loop>	              # if i >= n, jump to Exit Outer Loop
+ 11: 8b 1c 91	         mov  ebx,[ecx+edx*4]	    # x = a[i]
+ 14: 89 d0		       mov  eax,edx			     # j = i
 Inner Loop:
- 16: 8b 74 81 fc	mov  esi,[ecx+eax*4-0x4] # esi = a[j-1]
- 1a: 39 de			cmp  esi,ebx			# compare a[j-1] vs. x
- 1c: 7e 06			jle  24 <Exit Loop>		# if a[j-1]<=a[i],jump Exit Inner Loop
- 1e: 89 34 81		mov  [ecx+eax*4],esi	# a[j] = a[j-1]
- 21: 48				dec  eax				# j--
- 22: 75 f2			jne  16 <Inner Loop>	# if j != 0, jump to Inner Loop
+ 16: 8b 74 81 fc	  mov  esi,[ecx+eax*4-0x4]     # esi = a[j-1]
+ 1a: 39 de		       cmp  esi,ebx			       # compare a[j-1] vs. x
+ 1c: 7e 06		        jle  24 <Exit Loop>		     # if a[j-1]<=a[i],jump Exit Inner Loop
+ 1e: 89 34 81		mov  [ecx+eax*4],esi	  # a[j] = a[j-1]
+ 21: 48			       dec  eax				   # j--
+ 22: 75 f2			jne  16 <Inner Loop>	  # if j != 0, jump to Inner Loop
 Exit Inner Loop:
- 24: 89 1c 81		mov  [ecx+eax*4],ebx	# a[j] = x
- 27: 42				inc  edx				# i++
- 28: eb e1			jmp  b <Outer Loop>		# jump to Outer Loop
+ 24: 89 1c 81		 mov  [ecx+eax*4],ebx	   # a[j] = x
+ 27: 42			       inc  edx				    # i++
+ 28: eb e1		        jmp  b <Outer Loop>	         # jump to Outer Loop
 Exit Outer Loop:
- 2a: 5b				pop  ebx		# restore old value of ebx from stack
- 2b: 5e				pop  esi		# restore old value of esi from stack
- 2c: c3				ret				# return from function
+ 2a: 5b			      pop  ebx		                    # restore old value of ebx from stack
+ 2b: 5e			      pop  esi		                     # restore old value of esi from stack
+ 2c: c3			       ret				           # return from function
 ```
 
 <center>图2.11：图2.5中插入排序的x86-32代码。十六进制的地址在左边，接下来是十六进制的机器语言代码，然后是汇编语言指令，最后是注释。由于缺少寄存器，x86-32将将两个寄存器保存在堆栈中，以便腾出这两个寄存器供后续使用。而且，本来在RV32I中可以分配到寄存器的两个变量（n和指向a\[0\]的指针），现在是保存在内存中的。它使用扩展下标索引寻址模式，这对于访问\[i\]和\[j\]具有良好效果。这里的20条x32-86指令中有7条是只有一个字节那么长，这使得对于这个简单的程序，x86-32的代码规模很小。x86有两个流行的汇编语言版本：Intel/ Microsoft和AT＆T /Linux。我们使用英特尔语法，部分原因是它将目的地放在左边，而源操作数放在右边，与RISC-V，ARM-32和MIPS-32的操作数顺序一致。而AT＆T的操作数顺序则与之相反（并且对于寄存器操作数，需要在名字前加上%）。对于一些程序员来说，这看似微不足道的事情几乎是一个宗教问题。我们这里做出这样的选择，纯粹是因为教学方便，而非因为所谓"正统的信仰"。</center>
