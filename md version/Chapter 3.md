@@ -237,9 +237,32 @@ RISC-V编译器支持多个ABI，具体取决于F和D扩展是否存在。RV32�
 
 链接器检查程序的ABI是否和库匹配。尽管编译器本身可能支持多种ABI和ISA扩展的组合，但机器上可能只安装了特定的几种库。因此，一种常见的错误是在缺少合适的库的情况下链接程序。在这种情况下，链接器不会直接产生有用的诊断信息，它会尝试进行链接，然后提示不兼容。这种错误常常在从一台计算机上编译另一台计算机上运行的程序（交叉编译）时发生。
 
-![](pics/3.9.png)
+|指令| 描述   |
+| ---- | ---- |
+| .text | 代码段（机器语言代码）。 |
+|.data|数据段（全局变量）。|
+|.bss|bss段（初始化为 0 的全局变量）。|
+|.section  .foo|命名为 foo 的段。|
+|.align n|按 $$2^n$$ 字节对齐。如.align 2 是按字对齐。|
+|.balign n|按 n 字节对齐。如.balign 4 是按字对齐。|
+|.global sym|声明 sym 标签为全局的，可从其他文件访问。|
+|.string "str"|将字符串str存入内存。空字符结尾。|
+|.byte b1, ..., bn|在内存中连续存储 n 个8位的量。|
+|.half w1, ..., wn|在内存中连续存储 n 个16位的量。|
+|.word w1, ..., wn|在内存中连续存储 n 个32位的量。|
+|.dword w1, ..., wn|在内存中连续存储 n 个64位的量。|
+|.float f1, ..., fn|在内存中连续存储 n 个单精度浮点数。|
+|.double d1, ..., dn|在内存中连续存储 n 个双精度浮点数。|
+|.option rvc|压缩指令（见第7章）。|
+|.option norvc|不压缩指令。|
+|.option relax|允许链接器松弛。|
+|.option norelax|不允许链接器松弛。|
+|.option pic|与位置无关的代码段。|
+|.option nopic|与位置有关的代码段。|
+|.option push|将所有的.option设置压入栈，以便随后可以弹出恢复它们的值。|
+|.option pop|从栈中弹出上次压入的.option设置。|
 
-<center>图3.9 常见RISC-V汇编指示符。</center>
+<center>图3.9 常见RISC-V汇编指令。</center>
 
 ![](pics/3.10.png)
 
@@ -268,7 +291,7 @@ RISC-V编译器支持多个ABI，具体取决于F和D扩展是否存在。RV32�
 
 保持简洁，保持功能单一。
 
-—— Kelly Johnson，提出"KISS原则"的航空工程师，1960
+<div align=right>—— Kelly Johnson，提出"KISS原则"的航空工程师，1960<div>
 
 >>>![](pics/icon7.png)
 >>>![](pics/icon1.png)
