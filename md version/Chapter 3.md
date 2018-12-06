@@ -78,7 +78,7 @@ entry_label:
 # 按需恢复其它寄存器
 lw   ra,framesize-4(sp)	            # 恢复返回地址
 addi sp,sp, framesize               # 释放栈帧空间
-ret                                               # 返回到调用点
+ret                                 # 返回到调用点
 ```
 
 我们很快将会看到使用这套ABI的一个例子，但首先我们需要对汇编的其它部分进行一些解释。
@@ -110,7 +110,41 @@ ret                                               # 返回到调用点
 
 汇编器产生如图3.7的目标文件，格式为标准的可执行可链接文件（ELF）格式\[TIS Committee 1995\]。
 
-![](pics/3.3.png)
+|伪指令|基础指令|含义|
+|-|-|-|
+|nop|addi x0, x0, 9|无操作|
+|neg rd, rs|sub rd, x0, rs|补码|
+|negw rd, rs|subw rd, x0, rs|字补码|
+|snez rd, rs|sltu rd, x0, offeset|非0则置位|
+|sltz rd, rs|slt  rd, rs, x0|小于0则置位|
+|sgtz rd, rs|slt rd, x0, rs|大于0则置位|
+|beqz, rs, offset|beq rs, x0, offset|为0则转移|
+|bnez, rs, offset|bne rs, x0, offset|非0则转移|
+|blez, rs, offset|bge x0, rs, offset|小于等于0则转移|
+|bgez, rs, offset|bge rs, x0, offset|大于等于0则转移|
+|bltz, rs, offset|blt rs, x0, offset|小于0则转移|
+|bgtz, rs, offset|blt x0,rs, offset|大于0则转移|
+|j offset|jal x0, offset|跳转|
+|jr rs|jalr x0, rs, 0|寄存器跳转|
+|ret|jalr x0, x1, 0|从子过程返回|
+|tail offset|auipc x6, offset[31:12]|尾调用远程子过程|
+|tail offset|jalr x0, x6, offset[11:0]|尾调用远程子过程|
+|rdinstret[h] rd|csrrs rd, instret[h], x0|读取过时指令计数器|
+|rdcycle[h] rd|csrrs rd, cycle[h], x0|读取周期计数器|
+|rdtime[h] rd|csrrs rd, time[h], x0|读取实时时钟|
+|csrr rd, csr|csrrs rd, csr, x0|读CSR寄存器|
+|csrw csr, rs|csrrw x0, csr, rs|写CSR寄存器|
+|csrs csr, rs|csrrs x0, csr, rs|CSR寄存器置位|
+|csrc csr, rs|csrrc x0, csr, rs|清CSR寄存器|
+|csrwi csr, imm|csrwi x0, csr, imm|立即数写入CSR|
+|csrwi csr, imm|csrwi x0, csr, imm|立即数置位CSR|
+|csrci csr, imm|csrci x0, csr, imm|立即数清除CSR|
+|frcsr rd|csrrs rd, fcsr, x0|读取FP控制/状态级存器|
+|fscsr rs|csrrw x0, fcsr, rs|写入FP控制/状态级存器|
+|frrm rd|csrrs rd, frm, x0|读取FP舍入模式|
+|fsrm rs|csrrw x0, frm, rs|写入FP舍入模式|
+|frflags rd|csrrs rd fflags, x0|读取FP例外标志|
+|fsflags rs|csrrw x0, fflages, rs|写入FP例外标志|
 
 <center>图3.3 依赖于x0的RISC-V伪指令。附录A包含了这些RISC-V的伪指令和真实指令。在RV32I中，那些读取64位计数器的指令默认读取低32位，增加"h"时读取高32位。（这张图源于[Waterman and Asanovi´c 2017]的表20.2和表20.3。）</center>
 
