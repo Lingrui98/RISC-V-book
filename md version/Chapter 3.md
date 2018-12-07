@@ -148,7 +148,44 @@ ret                                 # 返回到调用点
 
 <center>图3.3 依赖于x0的RISC-V伪指令。附录A包含了这些RISC-V的伪指令和真实指令。在RV32I中，那些读取64位计数器的指令默认读取低32位，增加"h"时读取高32位。（这张图源于[Waterman and Asanovi´c 2017]的表20.2和表20.3。）</center>
 
-![](pics/3.4.png)
+|伪指令|基础指令|含义|
+|-|-|-|
+|lla rd, symbol|auipc rd, symbol[31:12]|取本地地址|
+|lla rd, symbol|addi rd, rd, symbol[11:0]|取本地地址|
+|la rd, symbol|PIC: auipc rd, GOT\[symbol\][31:12]|取地址|
+|la rd, symbol|l{w\|d} rd, rd, GOT\[symbol\][11:0]|取地址|
+|la rd, symbol|Non-PIC: 同 la rd, symbol|取地址|
+|l{b\|h\|w\|d} rd, symbol|auipc rd, symbol[31:12]|读取全局量|
+|l{b\|h\|w\|d} rd, symbol|l{b\|h\|w\|d} rd, symbol\[11:0\](rd)|读取全局量|
+|s{b\|h\|w\|d} rd, symbol, rt|auipc rt, symbol[31:12]|存储全局量|
+|s{b\|h\|w\|d} rd, symbol, rt|s{b\|h\|w\|d}rd, symbol\[11:0\](rt)|存储全局量|
+|fl{w\|d} rd, symbol, rt|auipc rt, symbol[31:12]|读取浮点全局量|
+|fl{w\|d} rd, symbol, rt|fl{w\|d} rd, symbo\[11:0\](rt)|读取浮点全局量|
+|fs{w\|d} rd, symbol, rt|auipc rt, symbol[31:12]|存储浮点全局量|
+|fs{w\|d} rd, symbol, rt|Fs{w\|d} rd, symbol\[11:0\](rt)|存储浮点全局量|
+|li rd, immediate|*Myriad sequences*|读取立即数|
+|mv rd, rs|addi rd, rs, 0|复制寄存器|
+|not rd, rs|xori rd, rs, -1|反码|
+|sext.w rd, rs|addiw rd, rs, 0|有符号扩展字|
+|seqz rd, rs|sltiu rd, rs, 1|为0时置位|
+|fmv.s rd, rs|fsgnj.s rd, rs, rs|复制单精度寄存器|
+|fab.s rd, rs|fsgnjx.s rd, rs, rs|单精度绝对值|
+|fneg.s rd, rs|fsgnjn.s rd, rs, rs|单精度相反数|
+|fmv.d rd, rs|fsgnj.d rd, rs, rs|复制双精度寄存器|
+|fab.d rd, rs|fsgnjx.d rd, rs, rs|双精度绝对值|
+|fneg.d rd, rs|fsgnjn.d rd, rs, rs|双精度相反数|
+|bgt rs, rt, offset|blt rs, rt, offset|大于时转移|
+|ble rs, rt, offset|bge rs, rt, offset|小于等于时转移|
+|bgtu rs, rt, offset|bltu rs, rt, offset|无符号大于时转移|
+|bleu rs, rt, offset|bgeu rs, rt, offset|无符号小于等于时转移|
+|jal offset|jal x1, offset|跳转并链接|
+|jalr rs|jalr x1, rs, 0|跳转并链接寄存器|
+|call offset|auipc x1, offset[31:12]|远程调用子过程|
+|call offset|jalr x1, x1, offset[11:0]|远程调用子过程|
+|fence|fence iorw, iorw|内存和I/O屏障|
+|fscsr rd, rs|csrrw rd, fcsr, rs|交换FP控制/状态寄存器|
+|fsrm rd, rs|csrrw rd, frm, rs|交换FP舍入模式|
+|fsflags rd, rs|csrrw rd, fflags, rs|交换FP例外标志|
 
 <center>图3.4 不依赖于x0寄存器的RISC-V伪指令。在la指令一栏，GOT代表全局偏移表（Global Offset Table），记录动态链接库中的符号的运行时地址。附录A包含了这些RISC-V的伪指令和真实指令。（这张图源于\[Waterman and Asanovi´c 2017\]的表20.2和表20.3。）</center>
 
