@@ -2,7 +2,7 @@
 
 *简洁性是可靠性的前提。*
 
-—— Edsger W. Dijkstra
+<div align=right>—— Edsger W. Dijkstra<div>
 
 >>>**Edsger W. Dijkstra**(1930-2002）因开发编程语言的基础性贡献而获得1972年图灵奖。
 >>>![](pics/Dijkstra.png)
@@ -308,7 +308,7 @@ RV64支持多种分页方案，但我们只介绍最受欢迎的一种，Sv39。
 
 > >*研究表明，最优秀的设计师会设计出更快、更小、更简单的结构，而且设计过程也更轻松。伟大的结构和一般的结构之间差了一个数量级。*
 
-> > —— Fred Brooks,Jr.,1986
+> > <div align=right>—— Fred Brooks,Jr.,1986<div>
 
 > > Brooks是图灵奖获得者，还是IBM System/360系列计算机的架构师（这些计算机说明了将架构和实现区分开来的重要性）。这个1964年诞生的架构的继承者至今仍在销售。
 
