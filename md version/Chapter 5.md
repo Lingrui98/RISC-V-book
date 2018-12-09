@@ -2,7 +2,7 @@
 
 *只有当没有任何东西可以去除，而不是没有东西可以添加时，我们才最终达到了完美。*
 
-—— Antoine de Saint Exup'ery, L'Avion, 1940
+<div align=right>—— Antoine de Saint Exup'ery, L'Avion, 1940<div>
 
 >>>Antoine de Saint Exup’ery, L’Avion（1900-1944）是法国作家和飞行员，以《小王子》一书而闻名。
 >>>![](pics/AntoineSaint.png)
@@ -149,9 +149,9 @@ void daxpy(size_t n, double a, const double x[], double y[])
 
 ## 5.7 结束语
 
-少即是多。
+*少即是多。*
 
-—— Robert Browning, 1855，极简主义（建筑）建筑学派在20世纪80年代采用这首诗作为公理。
+<div align=right>—— Robert Browning, 1855，极简主义（建筑）建筑学派在20世纪80年代采用这首诗作为公理。<div>
 
 IEEE 754-2008浮点标准\[IEEE Standards Committee 2008\]定义了浮点数据类型，计算精度和所需操作。它的广泛流行大大降低了移植浮点程序的难度，这也意味着不同ISA中的浮点数部分可能比其他章节中描述的其他部分的指令更一致。
 
@@ -171,57 +171,57 @@ A. Waterman and K. Asanovi´c, editors. *The RISC-V Instruction Set Manual, Volu
 ```assembly
 # RV32FD (7 insns in loop; 11 insns/44 bytes total; 28 bytes RVC)
 # a0 is n, a1 is pointer to x[0], a2 is pointer to y[0], fa0 is a
-  0: 02050463 beqz 	a0,28 				# if n == 0, jump to Exit
-  4: 00351513 slli 	a0,a0,0x3 			# a0 = n*8
-  8: 00a60533 add  	a0,a2,a0  			# a0 = address of x[n] (last element)
+  0: 02050463  beqz     a0,28             # if n == 0, jump to Exit
+  4: 00351513  slli     a0,a0,0x3         # a0 = n*8
+  8: 00a60533  add      a0,a2,a0          # a0 = address of x[n] (last element)
 Loop:
-  c: 0005b787 fld  	fa5,0(a1) 			# fa5 = x[]
- 10: 00063707 fld   fa4,0(a2) 			# fa4 = y[]
- 14: 00860613 addi  a2,a2,8   			# a2++ (increment pointer to y)
- 18: 00858593 addi 	a1,a1,8    			# a1++ (increment pointer to x)
- 1c: 72a7f7c3 fmadd.d fa5,fa5,fa0,fa4 	# fa5 = a*x[i] + y[i]
- 20: fef63c27 fsd  	fa5,-8(a2)      	# y[i] = a*x[i] + y[i]
- 24: fea614e3 bne  	a2,a0,c         	# if i != n, jump to Loop
+  c: 0005b787  fld      fa5,0(a1)         # fa5 = x[]
+ 10: 00063707  fld      fa4,0(a2)         # fa4 = y[]
+ 14: 00860613  addi     a2,a2,8           # a2++ (increment pointer to y)
+ 18: 00858593  addi     a1,a1,8           # a1++ (increment pointer to x)
+ 1c: 72a7f7c3  fmadd.d  fa5,fa5,fa0,fa4   # fa5 = a*x[i] + y[i]
+ 20: fef63c27  fsd      fa5,-8(a2)        # y[i] = a*x[i] + y[i]
+ 24: fea614e3  bne      a2,a0,c           # if i != n, jump to Loop
 Exit:
- 28: 00008067 		ret 				# return
+ 28: 00008067           ret               # return
 ```
 <center>图5.9：图5.7中DAXPY的RV32D代码。十六进制的地址位于机器的左侧，接下来是十六进制的语言代码，然后是汇编语言指令，最后是注释。比较和分支指令避免了ARM-32和X86-32代码中的两条比较指令。</center>
 
 ```assembly
 # ARM-32 (6 insns in loop; 10 insns/40 bytes total; 28 bytes Thumb-2)
 # r0 is n, d0 is a, r1 is pointer to x[0], r2 is pointer to y[0]
-  0: e3500000 cmp	r0, #0             # compare n to 0
-  4: 0a000006 beq	24 <daxpy+0x24>    # if n == 0, jump to Exit
-  8: e0820180 add	r0, r2, r0, lsl #3 # r0 = address of x[n] (last element)
+  0: e3500000  cmp       r0, #0                    # compare n to 0
+  4: 0a000006  beq       24 <daxpy+0x24>           # if n == 0, jump to Exit
+  8: e0820180  add       r0, r2, r0, lsl #3        # r0 = address of x[n] (last element)
 Loop:
-  c: ecb16b02 vldmia	r1!,{d6}		# d6 = x[i], increment pointer to x
- 10: ed927b00 vldr		d7,[r2]			# d7 = y[i]
- 14: ee067b00 vmla.f64 d7, d6, d0		# d7 = a*x[i] + y[i]
- 18: eca27b02 vstmia	r2!, {d7}		# y[i] = a*x[i] + y[i], incr. ptr to y
- 1c: e1520000 cmp		r2, r0			# i vs. n
- 20: 1afffff9 bne		c <daxpy+0xc>	# if i != n, jump to Loop
+  c: ecb16b02  vldmia    r1!,{d6}                  # d6 = x[i], increment pointer to x
+ 10: ed927b00  vldr      d7,[r2]                   # d7 = y[i]
+ 14: ee067b00  vmla.f64  d7, d6, d0                # d7 = a*x[i] + y[i]
+ 18: eca27b02  vstmia    r2!, {d7}                 # y[i] = a*x[i] + y[i], incr. ptr to y
+ 1c: e1520000  cmp       r2, r0                    # i vs. n
+ 20: 1afffff9  bne       c <daxpy+0xc>             # if i != n, jump to Loop
 Exit:
- 24: e12fff1e bx		lr 				# return
+ 24: e12fff1e  bx        lr                        # return
 ```
 <center>图5.10：图5.7中DAXPY的ARM-32代码。与RISC-V相比，ARM-32的自动增量寻址模式可以节省两条指令。与插入排序不同，DAXPY在ARM-32上不需要压栈和出栈寄存器。</center>
 
 ```assembly
 # MIPS-32 (7 insns in loop; 12 insns/48 bytes total; 32 bytes microMIPS)
 # a0 is n, a1 is pointer to x[0], a2 is pointer to y[0], f12 is a
- 0: 10800009 beqz a0,28 <daxpy+0x28>		# if n == 0,jump to Exit
- 4: 000420c0 sll  a0,a0,0x3					# a0 = n*8 (filled branch delay slot)
- 8: 00c42021 addu a0,a2,a0					# a0 = address of x[n] (last element)
+ 0: 10800009  beqz     a0,28 <daxpy+0x28>     # if n == 0,jump to Exit
+ 4: 000420c0  sll      a0,a0,0x3              # a0 = n*8 (filled branch delay slot)
+ 8: 00c42021  addu     a0,a2,a0               # a0 = address of x[n] (last element)
 Loop:
- c: 24c60008 addiu  a2,a2,8					# a2++ (increment pointer to y)
-10: d4a00000 ldc1   $f0,0(a1)				# f0=x[i]
-14: 24a50008 addiu  a1,a1,8					# a1++ (increment pointer to x) 
-18: d4c2fff8 ldc1	 $f2,-8(a2)				# f2 = y[i] 
-1c: 4c406021 madd.d $f0,$f2,$f12,$f0		# f0 = a*x[i]+y[i] 		
-20: 14c4fffa bne	 a2,a0,c <daxpy+0xc>	# ifi != n,jump to Loop
-24: f4c0fff8 sdc1	 $f0,-8(a2)				# y[i] = a*x[i] + y[i] (filled delay slot)
+ c: 24c60008  addiu    a2,a2,8                # a2++ (increment pointer to y)
+10: d4a00000  ldc1     $f0,0(a1)              # f0=x[i]
+14: 24a50008  addiu    a1,a1,8                # a1++ (increment pointer to x) 
+18: d4c2fff8  ldc1     $f2,-8(a2)             # f2 = y[i] 
+1c: 4c406021  madd.d   $f0,$f2,$f12,$f0       # f0 = a*x[i]+y[i] 		
+20: 14c4fffa  bne      a2,a0,c <daxpy+0xc>    # ifi != n,jump to Loop
+24: f4c0fff8  sdc1     $f0,-8(a2)             # y[i] = a*x[i] + y[i] (filled delay slot)
 Exit:
-28: 03e00008 jr	ra							# return
-2c: 00000000 nop							# (unfilled branch delay slot)
+28: 03e00008  jr	   ra                     # return
+2c: 00000000  nop                             # (unfilled branch delay slot)
 ```
 <center>图5.11：图5.7中DAXPY的MIPS-32代码。三个分支延迟槽中的两个填充了有用的指令。检查两个寄存器之间是否相等的指令避免了ARM-32和x86-32中的两条比较指令。与整数加载不同，浮点加载没有延迟槽。</center>
 
@@ -230,23 +230,23 @@ Exit:
 # eax is i, n is in memory at esp+0x8, a is in memory at esp+0xc
 # pointer to x[0] is in memory at esp+0x14
 # pointer to y[0] is in memory at esp+0x18
- 0: 53 					push ebx						# save ebx 
- 1: 8b 4c 24 08 		mov  ecx,[esp+0x8]				# ecx has copy of n 
- 5: c5 fb 10 4c 24 0c 	vmovsd  xmm1,[esp+0xc]			# xmm1 has a copy of a 	
- b: 8b 5c 24 14			mov  ebx,[esp+0x14]				# ebx points to x[0]
- f: 8b 54 24 18			mov  edx,[esp+0x18]				# edx points to y[0] 
-13: 85 c9				test ecx,ecx					# compare n to 0
-15: 74 19				je   30 <daxpy+0x30>			# if n==0, jump to Exit 
-17: 31 c0				xor  eax,eax					# i = 0 (since x^x==0)
+ 0: 53                   push ebx                           # save ebx 
+ 1: 8b 4c 24 08 		 mov  ecx,[esp+0x8]                 # ecx has copy of n 
+ 5: c5 fb 10 4c 24 0c    vmovsd  xmm1,[esp+0xc]             # xmm1 has a copy of a 	
+ b: 8b 5c 24 14          mov  ebx,[esp+0x14]                # ebx points to x[0]
+ f: 8b 54 24 18          mov  edx,[esp+0x18]                # edx points to y[0] 
+13: 85 c9                test ecx,ecx                       # compare n to 0
+15: 74 19                je   30 <daxpy+0x30>               # if n==0, jump to Exit 
+17: 31 c0                xor  eax,eax                       # i = 0 (since x^x==0)
 Loop:
-19: c5 fb 10 04 c3    vmovsd xmm0,[ebx+eax*8]			# xmm0 = x[i]
-1e: c4 e2 f1 a9 04 c2 vfmadd213sd xmm0,xmm1,[edx+eax*8] # xmm0 = a*x[i] + y[i]
-24: c5 fb 11 04 c2    vmovsd xmm0,xmm1,[edx+eax*8] 		# y[i] = a*x[i] + y[i]
-29: 83 c0 01          add	eax,0x1						# i++
-2c: 39 c1             cmp	ecx,eax						# compare i vs n
-2e: 75 e9             jne	19 <daxpy+0x19>				# if i != n, jump to Loop
+19: c5 fb 10 04 c3       vmovsd xmm0,[ebx+eax*8]            # xmm0 = x[i]
+1e: c4 e2 f1 a9 04 c2    vfmadd213sd xmm0,xmm1,[edx+eax*8]  # xmm0 = a*x[i] + y[i]
+24: c5 fb 11 04 c2       vmovsd xmm0,xmm1,[edx+eax*8]       # y[i] = a*x[i] + y[i]
+29: 83 c0 01             add	eax,0x1                     # i++
+2c: 39 c1                cmp	ecx,eax                     # compare i vs n
+2e: 75 e9                jne	19 <daxpy+0x19>             # if i != n, jump to Loop
 Exit:
-30: 5b                pop	ebx							# restore ebx
-31: c3                ret								# return
+30: 5b                   pop	ebx                         # restore ebx
+31: c3                   ret                                # return
 ```
 <center>图5.12：图5.7中DAXPY的x86-32代码。在这个例子中，x86-32缺少寄存器的劣势在这里表现得很明显 ---- 有四个变量被分配到了内存，而在其他ISA中，这些变量是被存放在寄存器中的。它展示了x86-32中，如何将寄存器与零比较（test ecx，ecx）以及如何将一个寄存器清零（xor eax, eax）。</center>
