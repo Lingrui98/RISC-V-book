@@ -920,7 +920,7 @@
 
 -----
 
-**csrc** csr, rs1 															CSRs\[csr\] \|= x\[rs1\]
+**csrs** csr, rs1 															CSRs\[csr\] \|= x\[rs1\]
 
 置位控制状态寄存器 *(Control and Status Register Set)*. 伪指令(Pesudoinstruction), RV32I 和 RV64I。
 
@@ -928,7 +928,7 @@
 
 ----
 
-**csrci** csr, zimm\[4:0\] 													CSRs\[csr\] \|= zimm
+**csrsi** csr, zimm\[4:0\] 													CSRs\[csr\] \|= zimm
 
 立即数置位控制状态寄存器 *(Control and Status Register Set Immediate)*. 伪指令(Pesudoinstruction), RV32I 和 RV64I。
 
